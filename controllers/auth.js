@@ -10,6 +10,8 @@ function tokenForUser(user) {
 exports.signup = function(req, res, next) {
     const email = req.body.email
     const password = req.body.password
+    const firstName = req.body.firstName
+    const lastName = req.body.lastName
 
     if (!email || !password) {
         return res.status(422).send({error: 'You must provide email and password'})
@@ -19,15 +21,15 @@ exports.signup = function(req, res, next) {
         if(err) { return next(err) }
         if(existingUser) { return res.status(422).send({error: 'email already exists'}) }
         
-        const user = new User({email: email, password: password})
+        const user = new User({email: email, password: password, firstName: firstName, lastName, lastName})
         user.save((err) => {
             if(err) { return next(err) }
-            res.json({ token: tokenForUser(user) })
+            res.json({ token: tokenForUser(user), user: user })
         })
     })
 }
 
 exports.signin = function(req, res, next) {
     //User already had email and password auth'd, just give a token
-    res.send({ token: tokenForUser(req.user)})
+    res.send({ token: tokenForUser(req.user), user: req.user})
 }
